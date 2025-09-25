@@ -1,0 +1,44 @@
+name: Grapevine
+description: A web application for cataloging and exploring grape varieties.
+
+entities:
+  User:
+    authenticable: true
+    properties:
+      - name
+      - { name: email, type: email, options: { required: true, unique: true } }
+      - { name: role, type: choice, options: { values: [vintner, enthusiast], default: enthusiast } }
+    policies:
+      create:
+        - access: admin
+      read:
+        - { access: restricted, allow: User, condition: self }
+        - access: admin
+      update:
+        - { access: restricted, allow: User, condition: self }
+        - access: admin
+      delete:
+        - access: admin
+      signup:
+        - access: public
+
+  GrapeVariety:
+    properties:
+      - { name: name, type: string, options: { required: true } }
+      - { name: description, type: text }
+      - { name: origin, type: string }
+      - { name: color, type: choice, options: { values: [Red, White, Rosé], default: Red } }
+      - { name: photo, type: image, options: { sizes: { thumbnail: { width: 400, height: 400 }, medium: { width: 800, height: 800 } } } }
+    belongsTo:
+      - { name: owner, entity: User }
+    policies:
+      create:
+        - { access: restricted, allow: User }
+      read:
+        - access: public
+      update:
+        - { access: restricted, allow: User, condition: self }
+        - access: admin
+      delete:
+        - { access: restricted, allow: User, condition: self }
+        - access: admin
